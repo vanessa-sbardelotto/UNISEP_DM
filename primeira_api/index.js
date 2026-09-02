@@ -4,54 +4,44 @@ const app = new express();
 
 app.use(express.json());
 
-var contador_id = 1;
+let contador_id = 1;
+
 var data = [{
-    id : 1,
-    nome: "Vanessa",
-    cpf: "999.999.999-99",
+    id: 1,
+    nome: "Guilherme",
+    cpf: "123456789",
     status: true
 }];
 
-app.get("/listar", (request, response) => {
+
+app.get("/listar", (request, response)=>{
     return response.send(data);
 });
 
-app.get("/Listar/:id", (request, response) => {
+app.get("/listar/:id", (request, response)=>{
     const { id } = request.params;
 
-    const pessoa = data.filter((item)=>{
-        return item.id == id 
+    const pessoa = data.filter((item) => {
+        return item.id == id
     });
 
-    if (pessoa.length == 0 ){
+    if (pessoa.length == 0) {
         response.status(400).send({
-           // msg : "Pessoa do código" + id + "Não encontrada!"
-           msg: `Pessoa do código ${id} não encontrada!`
+            msg: "Pessoa do código " + id + " não encontrada"
         });
     }
 
-    response.send(pessoa);
+    response.send(pessoa);  
+
 });
 
-app.post("/cadastrar", (request, response) => {
-    // const nome = request.body.nome;
-    // const cpf = request.body.cpf;
-    // const status = request.body.status;
-    // esses comentados são exemplos que tbm faz...
-    
-    const {nome, cpf, status } = request.body;
+app.post("/cadastrar", (request, response) =>{
+    const {nome, cpf, status} = request.body;
 
-    // console.log("Dados da passoa:");
-    // console.log(nome);
-    // console.log(cpf);
-    // console.log(status);
-
-
-    if(!nome){
-        return response.status(300).send("O campo NOME é obrigatório!");
-
-    }else if(!cpf) {
-        return response.status(300).send("O campo CPF é obrigatório!");
+    if (!nome){
+        return response.status(300).send("O campo NOME é obrigatório");
+    } else if (!cpf){
+        return response.status(300).send("O campo CPF é obrigatório");
     }
 
     contador_id++
@@ -63,55 +53,65 @@ app.post("/cadastrar", (request, response) => {
         status
     });
 
-    return response.send("Pessoa cadastrada com sucesso!");
+    return response.send("Pessoa cadastrada com sucesso!")
 });
 
-app.delete("/deletar/:id", (request, response)=>{
-    const { id } = request.params;
+app.delete("/deletar/:id", (request, response) =>{
+    const {id} = request.params;
 
     const indice = data.findIndex((item) => {
         return item.id == id
     });
 
-    if(indice !== -1) {
+    if (indice !== -1){
         data.splice(indice, 1);
     }
-
+    
     response.send(data);
-});
 
-app.put("/atualizar", (request, response)=> {
+})
+
+app.put("/atualizar", (request, response)=>{
     const {id, nome, cpf, status} = request.body;
 
-    if (!id){
-        response.status(300).send({
-            msg: `O campo ID é obrigatório!`
-        });
-    }
-
-    const indicePessoa = data.findIndex((item) =>{
+    const IndicePessoa = data.findIndex((item) => {
         return item.id == id;
     });
-    if (indicePessoa == -1){
-        response.status(400).send({
-            msg: `O id ${id} não existe!`
-        });
+
+    if (!id){
+        return response.status(300).send("O campo ID é obrigatório");
     }
 
-    data[indicePessoa].nome = nome;
-    data[indicePessoa].cpf = cpf;
-    data[indicePessoa].status = status;
+    if (IndicePessoa == -1){
+        response.status(400).send("O campo ID não foi encontrado");
+    } else {
+        data[IndicePessoa].nome = nome;
+        data[IndicePessoa].cpf = cpf;
+        data[IndicePessoa].status = status;
 
-    response.send(data[indicePessoa]);
+        response.send(data[IndicePessoa]);
+    }
+})
 
-});
 
 app.listen(8080, ()=>{
-    console.log("Servidor está rodando na porta 8080!");
+    console.log("O servidor está rodando na porta 8080")    
 });
 
+//status 500 = Erro Interno
+//status 200 = Sucesso
+//Status 400 = Não conseguiu encontrar determidada informação
+//Status 300 = Validações
 
-// Status 500 = Erro interno
-// Status 200 = Sucesso 
-// Status 400 = não conseguiu encontrar determinada infomração 
-// Status 300 = validações 
+//app.post("/cadastrar", (request, response) => {
+    // const nome = request.body.nome;
+    // const cpf = request.body.cpf;
+    // const status = request.body.status;
+    // esses comentados são exemplos que tbm faz...
+    
+    //const {nome, cpf, status } = request.body;
+
+    // console.log("Dados da passoa:");
+    // console.log(nome);
+    // console.log(cpf);
+    // console.log(status);

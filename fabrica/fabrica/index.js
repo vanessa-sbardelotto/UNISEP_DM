@@ -7,7 +7,7 @@ const mysql = knex({
         host: "localhost",
         user:"root",
         password: "1234",
-        database: "mercado"
+        database: "fabrica"
     }
 });
 async function testaConexaoComBancoDeDados() {
@@ -23,76 +23,80 @@ testaConexaoComBancoDeDados();
 
 const app = new express();
 
-app.use(express.json()); //cerealisação
+app.use(express.json());
+
 
 app.get("/listar", async(req, res)=>{
 
-    const produtos = await mysql.select("*").from("produto");
+    const pedidos = await mysql.select("*").from("pedido");
 
-    res.send(produtos);
+    res.send(pedidos);
 });
 
 app.get("/listar/:id", async(req, res)=>{
 
     const { id } = req.params;
 
-    const produto = await mysql.select("*")
-    .from("produto")
+    const pedidos = await mysql.select("*")
+    .from("pedido")
     .where({id: id});
 
-    res.send(produto)
+    res.send(pedidos)
 });
 
+
 app.post("/cadastrar", async (req, res) => {
-    const { nome, preco, qtd_estoque } = req.body;
+    const { nome, cpf, produto, quantidade, valor } = req.body;
 
-    const produto = await mysql.insert({
+    const pedido = await mysql.insert({
         nome,
-        preco,
-        qtd_estoque
-    }).into("produto");
+        cpf,
+        produto,
+        quantidade,
+        valor
+    }).into("pedido");
 
-    res.send(`Produto cadastrado: ${nome}`);
+    res.send(`Pedido cadastrado: ${nome}`);
 });
 
 app.put("/atualizar", async (req, res) => {
-    const { id, nome, preco, qtd_estoque } = req.body;
+    const { id, nome, cpf, produto, quantidade, valor } = req.body;
 
-    const produtoAtualizado = await mysql("produto")
+    const pedidoAtualizado = await mysql("pedido")
         .where({ id })
         .update({
             nome,
-            preco,
-            qtd_estoque
+            cpf,
+            produto,
+            quantidade,
+            valor
         });
 
-    if (produtoAtualizado == 1) {
-        const produto = await mysql.select("*")
-            .from("produto")
+    if (pedidoAtualizado == 1) {
+        const pedido = await mysql.select("*")
+            .from("pedido")
             .where({ id });
 
-        res.send(produto);
+        res.send(pedido);
     } else {
-        res.send({ msg: "Não foi possível atualizar o produto!" });
+        res.send({ msg: "Não foi possível atualizar o pedido!" });
     }
 });
-   
 
 app.delete("/excluir/:id", async (req, res) => {
     const { id } = req.params;
 
-    const produtoExcluido = await mysql("produto")
+    const pedidoExcluido = await mysql("pedido")
         .where({ id })
         .del();
 
-    if (produtoExcluido == 1) {
-        res.send({ msg: "Produto excluído com sucesso!" });
+    if (pedidoExcluido == 1) {
+        res.send({ msg: "Pedido excluído com sucesso!" });
     } else {
-        res.send({ msg: "Não foi possível excluir o produto!" });
+        res.send({ msg: "Não foi possível excluir o pedido!" });
     }
 });
 
 app.listen(8080, () => {
     console.log("O servidor está rodanddo na porta 8080");
-
 });

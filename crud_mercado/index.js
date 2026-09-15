@@ -80,4 +80,19 @@ app.put("/atualizar", async (req, res) => {
 
 app.listen(8080, () => {
     console.log("O servidor está rodanddo na porta 8080");
+
+});
+
+app.delete("/excluir/:id", async (req, res) => {
+    const { id } = req.params;
+
+    const produtoExcluido = await mysql("produto")
+        .where({ id })
+        .del();
+
+    if (produtoExcluido == 1) {
+        res.send({ msg: "Produto excluído com sucesso!" });
+    } else {
+        res.send({ msg: "Não foi possível excluir o produto!" });
+    }
 });
